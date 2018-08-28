@@ -163,7 +163,7 @@ class Feed_Forward_NN():
         predictions = predictions > threshold
         return predictions.astype(int)
 
-    def train_model(self):
+    def train_model(self:
 
         parameters = self.initialize_parameters(self.layers_dimension, _type='he')
         num_iterations = 2500
@@ -189,7 +189,8 @@ class Feed_Forward_NN():
 
     def mini_batch_gradient(self):
         parameters = self.initialize_parameters(self.layers_dimension, _type='he')
-        batch_size = 5000
+        batch_size = 1024
+        costs = []
         T = self.X_train.shape[1]//batch_size
 
         for t in range(T):
@@ -200,6 +201,16 @@ class Feed_Forward_NN():
             cost = self.compute_cost(AL, Y, caches)
             grads = self.backward_propagation(AL, Y, caches)
             parameters = self.update_parameters(parameters, grads, self.alpha)
+            if t % 100 == 0:
+                print ("Cost after iteration %i: %f" %(t, cost))
+                costs.append(cost)
+
+        plt.plot(np.squeeze(costs))
+        plt.ylabel('cost')
+        plt.xlabel('iterations (per tens)')
+        plt.title("Learning rate =" + str(self.alpha))
+        plt.show()
+        self.parameters = parameters
 
     def get_parameters(self):
         return self.parameters
