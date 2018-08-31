@@ -130,9 +130,9 @@ def update_parameters(parameters, grads, alpha):
         temp_param['b' + str(l)] = temp_param['b' + str(l)] - alpha*grads['db' + str(l)]
     return temp_param
 
-# def predict(self, X_test):
+# def predict(parameters, X_test):
 #     threshold = 0.5
-#     predictions, _ = self.forward_propagation(X_test, self.parameters)
+#     predictions, _ = forward_propagation(X_test, parameters)
 #     predictions = predictions > threshold
 #     return predictions.astype(int)
 
@@ -319,64 +319,64 @@ def neural_net_model(X, Y, layer_dimensions, optimizer, learning_rate=0.0007, ep
 
 
 
+if __name__ == '__main__':
+
+    def plot_decision_boundary(model, X, y):
+        # Set min and max values and give it some padding
+        x_min, x_max = X[0, :].min() - 1, X[0, :].max() + 1
+        y_min, y_max = X[1, :].min() - 1, X[1, :].max() + 1
+        h = 0.01
+        # Generate a grid of points with distance h between them
+        xx, yy = np.meshgrid(np.arange(x_min, x_max, h), np.arange(y_min, y_max, h))
+        # Predict the function value for the whole grid
+        Z = model(np.c_[xx.ravel(), yy.ravel()])
+        Z = Z.reshape(xx.shape)
+        # Plot the contour and training examples
+        plt.contourf(xx, yy, Z, cmap=plt.cm.Spectral)
+        plt.ylabel('x2')
+        plt.xlabel('x1')
+        plt.scatter(X[0, :], X[1, :], c=y, cmap=plt.cm.Spectral)
+        plt.show()
+
+    def predict(X, y, parameters):
+        m = X.shape[1]
+        p = np.zeros((1,m), dtype = np.int)
+        a3, caches = forward_propagation(X, parameters)
+        for i in range(0, a3.shape[1]):
+            if a3[0,i] > 0.5:
+                p[0,i] = 1
+            else:
+                p[0,i] = 0
+        print("Accuracy: "  + str(np.mean((p[0,:] == y[0,:]))))
+        
+        return p
+
+    def predict_dec(parameters, X):
+        a3, _ = forward_propagation(X, parameters)
+        predictions = (a3 > 0.5)
+        return predictions
 
 
-def plot_decision_boundary(model, X, y):
-    # Set min and max values and give it some padding
-    x_min, x_max = X[0, :].min() - 1, X[0, :].max() + 1
-    y_min, y_max = X[1, :].min() - 1, X[1, :].max() + 1
-    h = 0.01
-    # Generate a grid of points with distance h between them
-    xx, yy = np.meshgrid(np.arange(x_min, x_max, h), np.arange(y_min, y_max, h))
-    # Predict the function value for the whole grid
-    Z = model(np.c_[xx.ravel(), yy.ravel()])
-    Z = Z.reshape(xx.shape)
-    # Plot the contour and training examples
-    plt.contourf(xx, yy, Z, cmap=plt.cm.Spectral)
-    plt.ylabel('x2')
-    plt.xlabel('x1')
-    plt.scatter(X[0, :], X[1, :], c=y, cmap=plt.cm.Spectral)
-    plt.show()
+    def load_dataset():
+        np.random.seed(3)
+        train_X, train_Y = sklearn.datasets.make_moons(n_samples=300, noise=.2) #300 #0.2 
+        # plt.scatter(train_X[:, 0], train_X[:, 1], c=train_Y, s=40, cmap=plt.cm.Spectral);
+        train_X = train_X.T
+        train_Y = train_Y.reshape((1, train_Y.shape[0]))
+        
+        return train_X, train_Y
 
-def predict(X, y, parameters):
-    m = X.shape[1]
-    p = np.zeros((1,m), dtype = np.int)
-    a3, caches = forward_propagation(X, parameters)
-    for i in range(0, a3.shape[1]):
-        if a3[0,i] > 0.5:
-            p[0,i] = 1
-        else:
-            p[0,i] = 0
-    print("Accuracy: "  + str(np.mean((p[0,:] == y[0,:]))))
-    
-    return p
+    train_X, train_Y = load_dataset()
 
-def predict_dec(parameters, X):
-    a3, cache = forward_propagation(X, parameters)
-    predictions = (a3 > 0.5)
-    return predictions
+    layers_dims = [train_X.shape[0], 5, 2, 1]
+    parameters = neural_net_model(train_X, train_Y, layers_dims, optimizer = "adam")
 
+    # Predict
+    predictions = predict(train_X, train_Y, parameters)
 
-def load_dataset():
-    np.random.seed(3)
-    train_X, train_Y = sklearn.datasets.make_moons(n_samples=300, noise=.2) #300 #0.2 
-    # plt.scatter(train_X[:, 0], train_X[:, 1], c=train_Y, s=40, cmap=plt.cm.Spectral);
-    train_X = train_X.T
-    train_Y = train_Y.reshape((1, train_Y.shape[0]))
-    
-    return train_X, train_Y
-
-train_X, train_Y = load_dataset()
-
-layers_dims = [train_X.shape[0], 5, 2, 1]
-parameters = neural_net_model(train_X, train_Y, layers_dims, optimizer = "adam")
-
-# Predict
-predictions = predict(train_X, train_Y, parameters)
-
-# Plot decision boundary
-plt.title("Model with Gradient Descent optimization")
-axes = plt.gca()
-axes.set_xlim([-1.5,2.5])
-axes.set_ylim([-1,1.5])
-plot_decision_boundary(lambda x: predict_dec(parameters, x.T), train_X, train_Y)
+    # Plot decision boundary
+    plt.title("Model with Gradient Descent optimization")
+    axes = plt.gca()
+    axes.set_xlim([-1.5,2.5])
+    axes.set_ylim([-1,1.5])
+    plot_decision_boundary(lambda x: predict_dec(parameters, x.T), train_X, train_Y)
