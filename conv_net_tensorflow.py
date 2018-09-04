@@ -100,6 +100,64 @@ def forward_propagation(X, parameters):
     return Z3
 
 
+def compute_cost(Z3, Y):
+    
+    return tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits = Z3, labels = Y))
+
+def convnet_model(X_train, Y_train, X_test, Y_test, learning_rate=0.009, num_epochs=100, minibath_size=64):
+
+    (m, n_H0, n_W0, n_C0) = X_train.shape
+    (m, n_y) = Y_train.shape
+    seed = 3
+
+    X, Y = create_placeholders(m, n_H0, n_W0, n_C0, n_y)
+
+    parameters = initialize_parameters()
+
+    Z3 = forward_propagation(X, parameters)
+
+    cost = compute_cost(Z3, Y)
+
+    optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(cost)
+
+    init = tf.global_variables_initializer()
+
+    with tf.Session() as session:
+
+        session.run(init)
+
+        for _ in range(num_epochs):
+
+            seed = seed + 1
+
+            minibatches = generate_random_mini_batches(X_train, Y_train, minibath_size, seed)
+
+            for minibatch in minibatches:
+
+                mini_batch_X, mini_batch_Y = minibatch
+
+                _, cost = session.run([optimizer, cost], feed_dict={
+                    X : mini_batch_X,
+                    Y : mini_batch_Y
+                })
+
+        # Calculate the correct predictions
+        predict_op = tf.argmax(Z3, 1)
+        correct_prediction = tf.equal(predict_op, tf.argmax(Y, 1))
+            
+        # Calculate accuracy on the test set
+        accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
+        print(accuracy)
+        train_accuracy = accuracy.eval({X: X_train, Y: Y_train})
+        test_accuracy = accuracy.eval({X: X_test, Y: Y_test})
+        print("Train Accuracy:", train_accuracy)
+        print("Test Accuracy:", test_accuracy)
+
+    return parameters
+
+
+
+
 if __name__ == '__main__':
     X_train_orig, Y_train_orig, X_test_orig, Y_test_orig, classes = load_dataset()
     X_train = X_train_orig/255.

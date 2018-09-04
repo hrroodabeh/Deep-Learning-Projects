@@ -138,8 +138,7 @@ def model(X_train, Y_train, X_test, Y_test, learning_rate = 0.0001,
         print ("Test Accuracy:", accuracy.eval({X: X_test, Y: Y_test}))
         
         return parameters
-
-
+        
 
 if __name__ == '__main__':
     X_train_orig, Y_train_orig, X_test_orig, Y_test_orig, classes = load_dataset()
