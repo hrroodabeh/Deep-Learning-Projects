@@ -78,7 +78,7 @@ class Logistic_Regression():
         num_iters = 2000
         alpha = 0.5
         costs = []
-        for i in range(num_iters):
+        for _ in range(num_iters):
             grads, cost = self.compute_cost(self.x_train, self.y_train, params)
             costs.append(cost)
             params = self.update_params(params, grads, alpha)

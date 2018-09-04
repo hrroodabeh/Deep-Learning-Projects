@@ -163,7 +163,7 @@ class Feed_Forward_NN():
         predictions = predictions > threshold
         return predictions.astype(int)
 
-    def train_model(self:
+    def train_model(self):
 
         parameters = self.initialize_parameters(self.layers_dimension, _type='he')
         num_iterations = 2500
