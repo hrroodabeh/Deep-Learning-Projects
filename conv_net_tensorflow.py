@@ -110,7 +110,7 @@ def convnet_model(X_train, Y_train, X_test, Y_test, learning_rate=0.009, num_epo
     (m, n_y) = Y_train.shape
     seed = 3
 
-    X, Y = create_placeholders(m, n_H0, n_W0, n_C0, n_y)
+    X, Y = create_placeholders(n_H0, n_W0, n_C0, n_y)
 
     parameters = initialize_parameters()
 
