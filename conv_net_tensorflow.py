@@ -43,10 +43,10 @@ def predict(X, parameters):
 
 def one_hot(Y, C):
     m = Y.shape[1]
-    T = np.zeros((C, m))
+    o_h = np.zeros((C, m))
     for i in range(m):
-        T[Y[0, i], i] = 1
-    return T
+        o_h[Y[0, i], i] = 1
+    return o_h
 
 
 
@@ -62,7 +62,7 @@ def initialize_parameters():
     W1 = tf.get_variable('W1', [4, 4, 3, 8], initializer=tf.contrib.layers.xavier_initializer(seed = 0))
 
     # f = 2, n_c_prev = 8, n_c = 16
-    W2 = tf.get_variable('W1', [2, 2, 8, 16], initializer=tf.contrib.layers.xavier_initializer(seed = 0))
+    W2 = tf.get_variable('W2', [2, 2, 8, 16], initializer=tf.contrib.layers.xavier_initializer(seed = 0))
 
     parameters = {
         'W1' : W1,
