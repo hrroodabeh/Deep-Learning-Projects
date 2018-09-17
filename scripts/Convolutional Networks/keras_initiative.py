@@ -18,8 +18,9 @@ import matplotlib.pyplot as plt
 
 import keras.backend as K
 K.set_image_data_format('channels_last')
-
 # ------------------------------------------------------------------------------------------------------ #
+
+
 def load_dataset():
     train_dataset = h5py.File('datasets/train_happy.h5', "r")
     train_set_x_orig = np.array(train_dataset["train_set_x"][:]) # your train set features
@@ -40,7 +41,6 @@ def load_dataset():
 # loading datasets
 X_train_orig, Y_train_orig, X_test_orig, Y_test_orig, classes = load_dataset()
 
-
 # Normalize image vectors
 X_train = X_train_orig/255.
 X_test = X_test_orig/255.
@@ -49,8 +49,6 @@ X_test = X_test_orig/255.
 Y_train = Y_train_orig.T
 Y_test = Y_test_orig.T
 # ------------------------------------------------------------------------------------------------------ #
-
-
 
 
 def create_model(input_shape):
@@ -78,13 +76,21 @@ def create_model(input_shape):
     return model
 
 
-model = create_model(X_train.shape[1:])
+if __name__ == '__main__':
 
-model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+    model = create_model(X_train.shape[1:])
 
-model.fit(x = X_train, y = Y_train, epochs=7, batch_size=16)
+    model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 
-preds = model.evaluate(X_test, Y_test)
+    model.fit(x = X_train, y = Y_train, epochs=7, batch_size=16)
 
-predictions = model.predict(X_test)
+    preds = model.evaluate(X_test, Y_test)
+
+    predictions = model.predict(X_test)
+
+    # x = image.img_to_array(img)
+    # x = np.expand_dims(x, axis=0)
+    # x = preprocess_input(x)
+
+    # print(model.predict(x))
 
