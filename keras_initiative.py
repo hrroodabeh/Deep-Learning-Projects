@@ -9,21 +9,37 @@ from keras.preprocessing import image
 from keras.utils import layer_utils
 from keras.utils.data_utils import get_file
 from keras.applications.imagenet_utils import preprocess_input
-import pydot
+# import pydot
 from IPython.display import SVG
 from keras.utils.vis_utils import model_to_dot
 from keras.utils import plot_model
-from kt_utils import *
+import h5py
+import matplotlib.pyplot as plt
 
 import keras.backend as K
 K.set_image_data_format('channels_last')
 
 # ------------------------------------------------------------------------------------------------------ #
+def load_dataset():
+    train_dataset = h5py.File('datasets/train_happy.h5', "r")
+    train_set_x_orig = np.array(train_dataset["train_set_x"][:]) # your train set features
+    train_set_y_orig = np.array(train_dataset["train_set_y"][:]) # your train set labels
 
+    test_dataset = h5py.File('datasets/test_happy.h5', "r")
+    test_set_x_orig = np.array(test_dataset["test_set_x"][:]) # your test set features
+    test_set_y_orig = np.array(test_dataset["test_set_y"][:]) # your test set labels
+
+    classes = np.array(test_dataset["list_classes"][:]) # the list of classes
+    
+    train_set_y_orig = train_set_y_orig.reshape((1, train_set_y_orig.shape[0]))
+    test_set_y_orig = test_set_y_orig.reshape((1, test_set_y_orig.shape[0]))
+    
+    return train_set_x_orig, train_set_y_orig, test_set_x_orig, test_set_y_orig, classes
 
 
 # loading datasets
 X_train_orig, Y_train_orig, X_test_orig, Y_test_orig, classes = load_dataset()
+
 
 # Normalize image vectors
 X_train = X_train_orig/255.
@@ -55,7 +71,7 @@ def create_model(input_shape):
     X = Flatten()(X)
     
     # a fully connected Dense layer wich is a sigmoid classifier
-    X = Dense(1, activaiton = 'sigmoid', name='fc0')(X)
+    X = Dense(1, activation = 'sigmoid', name='fc0')(X)
     
     model = Model(inputs= X_input, outputs=X, name='Happy_House_Model')
     
